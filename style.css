@@ -14,11 +14,15 @@
 .container {
 	height: 100vh;
 	max-height: 100vh;
+	color: var(--color-white);
 	background-color: var(--color-primary);
+	font-size: 1.5rem;
 
 	display: flex;
+	flex-direction: column;
 	align-items: center;
 	justify-content: center;
+	gap: 1rem;
 }
 
 .game-area {
@@ -37,4 +41,24 @@
 	background-color: var(--color-primary);
 	border-radius: 50%;
 	cursor: pointer;
+}
+
+.player {
+	position: relative;
+	margin-bottom: 2rem;
+	transition: all 1s linear;
+
+	> .circle {
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+}
+
+.player1 {
+	background-color: var(--color-one);
+}
+
+.player2 {
+	background-color: var(--color-two);
 }
