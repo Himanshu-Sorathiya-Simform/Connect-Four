@@ -8,21 +8,23 @@ let initialTopPosition = +playerCircle.getBoundingClientRect().top;
 playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
 
-function findLastUnmodified(elements: HTMLDivElement[]) {
-	for (let i = 0; i < elements.length; i++) {
-		if (!elements.at(-i - 1)!.classList.contains('played'))
-			return elements.at(-i - 1);
+function findLastUnmodified(columnNumber: number) {
+	for (let i = 0; i < 7; i++) {
+		if (
+			![...allElements]
+				.at(-i * 7 - (7 - columnNumber))!
+				.classList.contains('played')
+		)
+			return [...allElements].at(-i * 7 - (7 - columnNumber));
 	}
 
 	return false;
 }
 
 function insertToCircle(columnNumber: number, user: string) {
-	const allColumnElements = [...allElements].filter(
-		(ele) => ele.dataset['id'] && +ele.dataset['id'] % 7 === columnNumber,
-	);
+	gameArea.style.pointerEvents = 'none';
 
-	const insertToElement = findLastUnmodified(allColumnElements);
+	const insertToElement = findLastUnmodified(columnNumber);
 
 	if (!insertToElement && user === 'player2') callComputer();
 
@@ -53,6 +55,8 @@ function insertToCircle(columnNumber: number, user: string) {
 			requestAnimationFrame(() => {
 				playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
 			});
+
+			gameArea.style.pointerEvents = 'all';
 		}, 1000);
 	}, 150);
 }
