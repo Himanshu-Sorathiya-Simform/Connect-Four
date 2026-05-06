@@ -46,13 +46,10 @@
 .player {
 	position: relative;
 	margin-bottom: 2rem;
-	transition: all 1s linear;
-
-	> .circle {
-		position: absolute;
-		top: 0;
-		left: 0;
-	}
+	transition:
+		top 1000ms linear,
+		left 150ms linear;
+	cursor: default;
 }
 
 .player1 {
