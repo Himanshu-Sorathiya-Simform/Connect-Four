@@ -3,9 +3,10 @@ import type { User } from './script.js';
 const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
 
 function findLastUnmodified(columnNumber: number) {
-	for (let i = 0; i < 7; i++) {
-		if (!allElements.at(-i * 7 - (7 - columnNumber))!.classList.contains('played'))
-			return allElements.at(-i * 7 - (7 - columnNumber));
+	for (let i = 6; i >= 0; i--) {
+		const ele = allElements[i * 7 - (7 - columnNumber)];
+
+		if (ele && !ele.classList.contains('played')) return ele;
 	}
 
 	return false;
@@ -15,7 +16,7 @@ function isWin(elementId: string | undefined, user: User) {
 	if (!elementId) return;
 
 	const column = +elementId % 7;
-	const row = +elementId / 7;
+	const row = Math.floor(+elementId / 7);
 
 	const horizontalWin = checkHorizontal(+elementId, column, user);
 	const verticalWin = checkVertical(+elementId, user);
@@ -83,7 +84,7 @@ function checkDiagonal(elementId: number, row: number, user: User) {
 		const ele = allElements[elementId - (i + 1) * 8];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || row - i - 1 !== +eleID / 7) break;
+		if (!ele || !eleID || row - i - 1 !== Math.floor(+eleID / 7)) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
@@ -96,7 +97,7 @@ function checkDiagonal(elementId: number, row: number, user: User) {
 		const ele = allElements[elementId + (i + 1) * 8];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || row + i + 1 !== +eleID / 7) break;
+		if (!ele || !eleID || row + i + 1 !== Math.floor(+eleID / 7)) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
@@ -115,7 +116,7 @@ function checkAntiDiagonal(elementId: number, row: number, user: User) {
 		const ele = allElements[elementId - (i + 1) * 6];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || row - i - 1 !== +eleID / 7) break;
+		if (!ele || !eleID || row - i - 1 !== Math.floor(+eleID / 7)) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
@@ -128,7 +129,7 @@ function checkAntiDiagonal(elementId: number, row: number, user: User) {
 		const ele = allElements[elementId + (i + 1) * 6];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || row + i + 1 !== +eleID / 7) break;
+		if (!ele || !eleID || row + i + 1 !== Math.floor(+eleID / 7)) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
