@@ -15,22 +15,23 @@ function isWin(elementId: string | undefined, user: User) {
 	if (!elementId) return;
 
 	const column = +elementId % 7;
-	const row = Math.floor(+elementId / 7);
 
-	const horizontalWin = checkHorizontal(+elementId, row, column, user);
-	const verticalWin = checkVertical(+elementId, row, column, user);
+	const horizontalWin = checkHorizontal(+elementId, column, user);
+	const verticalWin = checkVertical(+elementId, user);
+	const diagonalWin = checkDiagonal(+elementId, user);
+	const antiDiagonalWin = checkAntiDiagonal(+elementId, user);
 
-	return horizontalWin || verticalWin;
+	return horizontalWin || verticalWin || diagonalWin || antiDiagonalWin;
 }
 
-function checkHorizontal(elementId: number, row: number, column: number, user: User) {
+function checkHorizontal(elementId: number, column: number, user: User) {
 	let count = 1;
 
 	for (let i = 0; i < column; i++) {
 		const ele = allElements[elementId - i - 1];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || Math.floor(+eleID / 7) !== row) break;
+		if (!ele || !eleID) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
@@ -43,7 +44,7 @@ function checkHorizontal(elementId: number, row: number, column: number, user: U
 		const ele = allElements[elementId + i + 1];
 		const eleID = ele?.dataset['id']!;
 
-		if (!ele || !eleID || Math.floor(+eleID / 7) !== row) break;
+		if (!ele || !eleID) break;
 
 		if (ele.classList.contains(user)) {
 			count++;
@@ -55,11 +56,75 @@ function checkHorizontal(elementId: number, row: number, column: number, user: U
 	return count >= 4;
 }
 
-function checkVertical(elementId: number, row: number, column: number, user: User) {
+function checkVertical(elementId: number, user: User) {
 	let count = 1;
 
 	for (let i = 0; i < 3; i++) {
 		const ele = allElements[elementId + 7 * (i + 1)];
+		const eleID = ele?.dataset['id']!;
+
+		if (!ele || !eleID) break;
+
+		if (ele.classList.contains(user)) {
+			count++;
+		} else {
+			break;
+		}
+	}
+
+	return count >= 4;
+}
+
+function checkDiagonal(elementId: number, user: User) {
+	let count = 1;
+
+	for (let i = 0; i < 3; i++) {
+		const ele = allElements[elementId - (i + 1) * 8];
+		const eleID = ele?.dataset['id']!;
+
+		if (!ele || !eleID) break;
+
+		if (ele.classList.contains(user)) {
+			count++;
+		} else {
+			break;
+		}
+	}
+
+	for (let i = 0; i < 3; i++) {
+		const ele = allElements[elementId + (i + 1) * 8];
+		const eleID = ele?.dataset['id']!;
+
+		if (!ele || !eleID) break;
+
+		if (ele.classList.contains(user)) {
+			count++;
+		} else {
+			break;
+		}
+	}
+
+	return count >= 4;
+}
+
+function checkAntiDiagonal(elementId: number, user: User) {
+	let count = 1;
+
+	for (let i = 0; i < 3; i++) {
+		const ele = allElements[elementId - (i + 1) * 6];
+		const eleID = ele?.dataset['id']!;
+
+		if (!ele || !eleID) break;
+
+		if (ele.classList.contains(user)) {
+			count++;
+		} else {
+			break;
+		}
+	}
+
+	for (let i = 0; i < 3; i++) {
+		const ele = allElements[elementId + (i + 1) * 6];
 		const eleID = ele?.dataset['id']!;
 
 		if (!ele || !eleID) break;

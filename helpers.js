@@ -10,17 +10,18 @@ function isWin(elementId, user) {
     if (!elementId)
         return;
     const column = +elementId % 7;
-    const row = Math.floor(+elementId / 7);
-    const horizontalWin = checkHorizontal(+elementId, row, column, user);
-    const verticalWin = checkVertical(+elementId, row, column, user);
-    return horizontalWin || verticalWin;
+    const horizontalWin = checkHorizontal(+elementId, column, user);
+    const verticalWin = checkVertical(+elementId, user);
+    const diagonalWin = checkDiagonal(+elementId, user);
+    const antiDiagonalWin = checkAntiDiagonal(+elementId, user);
+    return horizontalWin || verticalWin || diagonalWin || antiDiagonalWin;
 }
-function checkHorizontal(elementId, row, column, user) {
+function checkHorizontal(elementId, column, user) {
     let count = 1;
     for (let i = 0; i < column; i++) {
         const ele = allElements[elementId - i - 1];
         const eleID = ele?.dataset['id'];
-        if (!ele || !eleID || Math.floor(+eleID / 7) !== row)
+        if (!ele || !eleID)
             break;
         if (ele.classList.contains(user)) {
             count++;
@@ -32,7 +33,7 @@ function checkHorizontal(elementId, row, column, user) {
     for (let i = 0; i < 7 - column; i++) {
         const ele = allElements[elementId + i + 1];
         const eleID = ele?.dataset['id'];
-        if (!ele || !eleID || Math.floor(+eleID / 7) !== row)
+        if (!ele || !eleID)
             break;
         if (ele.classList.contains(user)) {
             count++;
@@ -43,10 +44,66 @@ function checkHorizontal(elementId, row, column, user) {
     }
     return count >= 4;
 }
-function checkVertical(elementId, row, column, user) {
+function checkVertical(elementId, user) {
     let count = 1;
     for (let i = 0; i < 3; i++) {
         const ele = allElements[elementId + 7 * (i + 1)];
+        const eleID = ele?.dataset['id'];
+        if (!ele || !eleID)
+            break;
+        if (ele.classList.contains(user)) {
+            count++;
+        }
+        else {
+            break;
+        }
+    }
+    return count >= 4;
+}
+function checkDiagonal(elementId, user) {
+    let count = 1;
+    for (let i = 0; i < 3; i++) {
+        const ele = allElements[elementId - (i + 1) * 8];
+        const eleID = ele?.dataset['id'];
+        if (!ele || !eleID)
+            break;
+        if (ele.classList.contains(user)) {
+            count++;
+        }
+        else {
+            break;
+        }
+    }
+    for (let i = 0; i < 3; i++) {
+        const ele = allElements[elementId + (i + 1) * 8];
+        const eleID = ele?.dataset['id'];
+        if (!ele || !eleID)
+            break;
+        if (ele.classList.contains(user)) {
+            count++;
+        }
+        else {
+            break;
+        }
+    }
+    return count >= 4;
+}
+function checkAntiDiagonal(elementId, user) {
+    let count = 1;
+    for (let i = 0; i < 3; i++) {
+        const ele = allElements[elementId - (i + 1) * 6];
+        const eleID = ele?.dataset['id'];
+        if (!ele || !eleID)
+            break;
+        if (ele.classList.contains(user)) {
+            count++;
+        }
+        else {
+            break;
+        }
+    }
+    for (let i = 0; i < 3; i++) {
+        const ele = allElements[elementId + (i + 1) * 6];
         const eleID = ele?.dataset['id'];
         if (!ele || !eleID)
             break;
