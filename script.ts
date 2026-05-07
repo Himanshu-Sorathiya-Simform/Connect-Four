@@ -1,27 +1,25 @@
 const header = document.querySelector<HTMLHeadingElement>('h1')!;
 const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
 const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
-const allElements = document.querySelectorAll<HTMLDivElement>('.game-circle');
+const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
 
 let initialLeftPosition = +playerCircle.getBoundingClientRect().left;
 let initialTopPosition = +playerCircle.getBoundingClientRect().top;
 playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
 
+let user: 'player1' | 'player2' = 'player1';
+
 function findLastUnmodified(columnNumber: number) {
 	for (let i = 0; i < 7; i++) {
-		if (
-			![...allElements]
-				.at(-i * 7 - (7 - columnNumber))!
-				.classList.contains('played')
-		)
-			return [...allElements].at(-i * 7 - (7 - columnNumber));
+		if (!allElements.at(-i * 7 - (7 - columnNumber))!.classList.contains('played'))
+			return allElements.at(-i * 7 - (7 - columnNumber));
 	}
 
 	return false;
 }
 
-function insertToCircle(columnNumber: number, user: string) {
+function insertCircle(columnNumber: number) {
 	gameArea.style.pointerEvents = 'none';
 
 	const insertToElement = findLastUnmodified(columnNumber);
@@ -30,15 +28,17 @@ function insertToCircle(columnNumber: number, user: string) {
 
 	if (!insertToElement) return;
 
-	const elementLeftCoordinates = +insertToElement.getBoundingClientRect().left;
-	const moveLeft = elementLeftCoordinates - initialLeftPosition;
-	playerCircle.style.left = `${moveLeft}px`;
+	const elementCoordinates = insertToElement.getBoundingClientRect();
 
-	const elementTopCoordinates = +insertToElement.getBoundingClientRect().top;
-	const moveBottom = elementTopCoordinates - initialTopPosition;
+	const elementLeftCoordinates = +elementCoordinates.left;
+	const newLeftPosition = elementLeftCoordinates - initialLeftPosition;
+	playerCircle.style.left = `${newLeftPosition}px`;
+
+	const elementTopCoordinates = +elementCoordinates.top;
+	const newTopPosition = elementTopCoordinates - initialTopPosition;
 
 	setTimeout(() => {
-		playerCircle.style.top = `${moveBottom}px`;
+		playerCircle.style.top = `${newTopPosition}px`;
 		insertToElement.classList.add('played');
 
 		setTimeout(() => {
@@ -57,6 +57,7 @@ function insertToCircle(columnNumber: number, user: string) {
 			});
 
 			gameArea.style.pointerEvents = 'all';
+			user = user === 'player1' ? 'player2' : 'player1';
 		}, 1000);
 	}, 150);
 }
@@ -64,17 +65,17 @@ function insertToCircle(columnNumber: number, user: string) {
 function callComputer() {
 	const columnNumber = Math.trunc(Math.random() * 7);
 
-	insertToCircle(columnNumber, 'player2');
+	insertCircle(columnNumber);
 }
 
 gameArea.addEventListener('click', (e) => {
 	const circle = <HTMLDivElement>(e.target as HTMLDivElement).closest('.circle');
 
-	if (!circle) return;
+	if (!circle || !circle.dataset['id']) return;
 
-	const columnNumber = +(circle.dataset['id'] || 0) % 7;
+	const columnNumber = +circle.dataset['id'] % 7;
 
-	insertToCircle(columnNumber, 'player1');
+	insertCircle(columnNumber);
 
 	setTimeout(callComputer, 1500);
 });
