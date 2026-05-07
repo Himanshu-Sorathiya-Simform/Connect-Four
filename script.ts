@@ -4,16 +4,16 @@ const header = document.querySelector<HTMLHeadingElement>('h1')!;
 const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
 const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
 
+type User = 'player1' | 'player2';
+
 let initialLeftPosition = +playerCircle.getBoundingClientRect().left;
 let initialTopPosition = +playerCircle.getBoundingClientRect().top;
 playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
 
-type User = 'player1' | 'player2';
-
 let user: User = 'player1';
-
 let count = 0;
+let timer: undefined | number = undefined;
 
 function insertCircle(columnNumber: number) {
 	count++;
@@ -55,11 +55,11 @@ function insertCircle(columnNumber: number) {
 
 			gameArea.style.pointerEvents = 'all';
 
-			if (count >= 7) {
-				if (isWin(insertToElement.dataset['id'], user)) {
-					header.textContent =
-						user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
-				}
+			if (count >= 7 && isWin(insertToElement.dataset['id'], user)) {
+				header.textContent = user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
+
+				gameArea.style.pointerEvents = 'none';
+				clearTimeout(timer);
 			}
 
 			user = user === 'player1' ? 'player2' : 'player1';
@@ -82,7 +82,7 @@ gameArea.addEventListener('click', (e) => {
 
 	insertCircle(columnNumber);
 
-	setTimeout(callComputer, 1500);
+	timer = setTimeout(callComputer, 1500);
 });
 
 export type { User };

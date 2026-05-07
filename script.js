@@ -8,6 +8,7 @@ playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
 let user = 'player1';
 let count = 0;
+let timer = undefined;
 function insertCircle(columnNumber) {
     count++;
     gameArea.style.pointerEvents = 'none';
@@ -37,11 +38,10 @@ function insertCircle(columnNumber) {
                 playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
             });
             gameArea.style.pointerEvents = 'all';
-            if (count >= 7) {
-                if (isWin(insertToElement.dataset['id'], user)) {
-                    header.textContent =
-                        user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
-                }
+            if (count >= 7 && isWin(insertToElement.dataset['id'], user)) {
+                header.textContent = user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
+                gameArea.style.pointerEvents = 'none';
+                clearTimeout(timer);
             }
             user = user === 'player1' ? 'player2' : 'player1';
         }, 1000);
@@ -57,6 +57,6 @@ gameArea.addEventListener('click', (e) => {
         return;
     const columnNumber = +circle.dataset['id'] % 7;
     insertCircle(columnNumber);
-    setTimeout(callComputer, 1500);
+    timer = setTimeout(callComputer, 1500);
 });
 //# sourceMappingURL=script.js.map
