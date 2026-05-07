@@ -60,7 +60,10 @@ function insertCircle(columnNumber: number) {
 			gameArea.style.pointerEvents = 'all';
 
 			if (count >= 7 && isWin(insertToElement.dataset['id'], user)) {
-				header.textContent = user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
+				const youWin = user === 'player1';
+
+				header.textContent = youWin ? 'YOU WON!!' : 'COMPUTER WON';
+				header.style.color = youWin ? 'var(--color-one)' : 'var(--color-two)';
 
 				gameArea.style.pointerEvents = 'none';
 				playerCircle.hidden = true;
@@ -106,6 +109,8 @@ restartButton.addEventListener('click', () => {
 	playerCircle.classList.remove('player1');
 	playerCircle.classList.remove('player2');
 	playerCircle.classList.add('player1');
+
+	header.style.color = 'var(--color-white)';
 
 	requestAnimationFrame(() => {
 		playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';

@@ -11,6 +11,10 @@
 	box-sizing: border-box;
 }
 
+html {
+	font-family: 'Poppins', sans-serif;
+}
+
 .container {
 	position: relative;
 
