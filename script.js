@@ -1,34 +1,29 @@
+import { findLastUnmodified, isWin } from './helpers.js';
 const header = document.querySelector('h1');
 const playerCircle = document.querySelector('.player');
 const gameArea = document.querySelector('.game-area');
-const allElements = document.querySelectorAll('.game-circle');
 let initialLeftPosition = +playerCircle.getBoundingClientRect().left;
 let initialTopPosition = +playerCircle.getBoundingClientRect().top;
 playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
-function findLastUnmodified(columnNumber) {
-    for (let i = 0; i < 7; i++) {
-        if (![...allElements]
-            .at(-i * 7 - (7 - columnNumber))
-            .classList.contains('played'))
-            return [...allElements].at(-i * 7 - (7 - columnNumber));
-    }
-    return false;
-}
-function insertToCircle(columnNumber, user) {
+let user = 'player1';
+let count = 0;
+function insertCircle(columnNumber) {
+    count++;
     gameArea.style.pointerEvents = 'none';
     const insertToElement = findLastUnmodified(columnNumber);
     if (!insertToElement && user === 'player2')
         callComputer();
     if (!insertToElement)
         return;
-    const elementLeftCoordinates = +insertToElement.getBoundingClientRect().left;
-    const moveLeft = elementLeftCoordinates - initialLeftPosition;
-    playerCircle.style.left = `${moveLeft}px`;
-    const elementTopCoordinates = +insertToElement.getBoundingClientRect().top;
-    const moveBottom = elementTopCoordinates - initialTopPosition;
+    const elementCoordinates = insertToElement.getBoundingClientRect();
+    const elementLeftCoordinates = +elementCoordinates.left;
+    const newLeftPosition = elementLeftCoordinates - initialLeftPosition;
+    playerCircle.style.left = `${newLeftPosition}px`;
+    const elementTopCoordinates = +elementCoordinates.top;
+    const newTopPosition = elementTopCoordinates - initialTopPosition;
     setTimeout(() => {
-        playerCircle.style.top = `${moveBottom}px`;
+        playerCircle.style.top = `${newTopPosition}px`;
         insertToElement.classList.add('played');
         setTimeout(() => {
             insertToElement.classList.add(user);
@@ -42,20 +37,26 @@ function insertToCircle(columnNumber, user) {
                 playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
             });
             gameArea.style.pointerEvents = 'all';
+            if (count >= 7) {
+                if (isWin(insertToElement.dataset['id'], user)) {
+                    header.textContent =
+                        user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
+                }
+            }
+            user = user === 'player1' ? 'player2' : 'player1';
         }, 1000);
     }, 150);
 }
 function callComputer() {
     const columnNumber = Math.trunc(Math.random() * 7);
-    insertToCircle(columnNumber, 'player2');
+    insertCircle(columnNumber);
 }
 gameArea.addEventListener('click', (e) => {
     const circle = e.target.closest('.circle');
-    if (!circle)
+    if (!circle || !circle.dataset['id'])
         return;
-    const columnNumber = +(circle.dataset['id'] || 0) % 7;
-    insertToCircle(columnNumber, 'player1');
+    const columnNumber = +circle.dataset['id'] % 7;
+    insertCircle(columnNumber);
     setTimeout(callComputer, 1500);
 });
-export {};
 //# sourceMappingURL=script.js.map

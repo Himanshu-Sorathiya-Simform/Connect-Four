@@ -1,25 +1,22 @@
+import { findLastUnmodified, isWin } from './helpers.js';
+
 const header = document.querySelector<HTMLHeadingElement>('h1')!;
 const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
 const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
-const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
 
 let initialLeftPosition = +playerCircle.getBoundingClientRect().left;
 let initialTopPosition = +playerCircle.getBoundingClientRect().top;
 playerCircle.style.left = `0px`;
 playerCircle.style.top = `0px`;
 
-let user: 'player1' | 'player2' = 'player1';
+type User = 'player1' | 'player2';
 
-function findLastUnmodified(columnNumber: number) {
-	for (let i = 0; i < 7; i++) {
-		if (!allElements.at(-i * 7 - (7 - columnNumber))!.classList.contains('played'))
-			return allElements.at(-i * 7 - (7 - columnNumber));
-	}
+let user: User = 'player1';
 
-	return false;
-}
+let count = 0;
 
 function insertCircle(columnNumber: number) {
+	count++;
 	gameArea.style.pointerEvents = 'none';
 
 	const insertToElement = findLastUnmodified(columnNumber);
@@ -57,6 +54,14 @@ function insertCircle(columnNumber: number) {
 			});
 
 			gameArea.style.pointerEvents = 'all';
+
+			if (count >= 7) {
+				if (isWin(insertToElement.dataset['id'], user)) {
+					header.textContent =
+						user === 'player1' ? 'YOU WON!!' : 'COMPUTER WON';
+				}
+			}
+
 			user = user === 'player1' ? 'player2' : 'player1';
 		}, 1000);
 	}, 150);
@@ -79,3 +84,5 @@ gameArea.addEventListener('click', (e) => {
 
 	setTimeout(callComputer, 1500);
 });
+
+export type { User };
