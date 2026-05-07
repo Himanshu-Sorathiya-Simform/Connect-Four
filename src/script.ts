@@ -3,6 +3,8 @@ import { findLastUnmodified, isWin } from './helpers.js';
 const header = document.querySelector<HTMLHeadingElement>('h1')!;
 const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
 const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
+const restartButton = document.querySelector<HTMLButtonElement>('.restart-button')!;
+const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
 
 type User = 'player1' | 'player2';
 
@@ -13,7 +15,9 @@ playerCircle.style.top = `0px`;
 
 let user: User = 'player1';
 let count = 0;
-let timer: undefined | number = undefined;
+let timer1: undefined | number = undefined;
+let timer2: undefined | number = undefined;
+let timer3: undefined | number = undefined;
 
 function insertCircle(columnNumber: number) {
 	const insertToElement = findLastUnmodified(columnNumber);
@@ -34,11 +38,11 @@ function insertCircle(columnNumber: number) {
 	const elementTopCoordinates = +elementCoordinates.top;
 	const newTopPosition = elementTopCoordinates - initialTopPosition;
 
-	setTimeout(() => {
+	timer2 = setTimeout(() => {
 		playerCircle.style.top = `${newTopPosition}px`;
 		insertToElement.classList.add('played');
 
-		setTimeout(() => {
+		timer3 = setTimeout(() => {
 			insertToElement.classList.add(user);
 
 			header.textContent = user === 'player1' ? 'Computer Move' : 'Your Move';
@@ -60,7 +64,7 @@ function insertCircle(columnNumber: number) {
 
 				gameArea.style.pointerEvents = 'none';
 				playerCircle.hidden = true;
-				clearTimeout(timer);
+				clearTimeout(timer1);
 			}
 
 			user = user === 'player1' ? 'player2' : 'player1';
@@ -86,8 +90,34 @@ gameArea.addEventListener('click', (e) => {
 	const isSuccess = insertCircle(columnNumber);
 
 	if (isSuccess) {
-		timer = setTimeout(callComputer, 1500);
+		timer1 = setTimeout(callComputer, 1500);
 	}
+});
+
+restartButton.addEventListener('click', () => {
+	count = 0;
+	user = 'player1';
+	header.textContent = 'Your Move';
+
+	playerCircle.hidden = false;
+	playerCircle.style.transition = 'none';
+	playerCircle.style.top = `0px`;
+	playerCircle.style.left = `0px`;
+	playerCircle.classList.remove('player1');
+	playerCircle.classList.remove('player2');
+	playerCircle.classList.add('player1');
+
+	requestAnimationFrame(() => {
+		playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
+	});
+
+	gameArea.style.pointerEvents = 'all';
+
+	allElements.forEach((ele) => ele.classList.remove('player1', 'player2', 'played'));
+
+	clearTimeout(timer1);
+	clearTimeout(timer2);
+	clearTimeout(timer3);
 });
 
 export type { User };
