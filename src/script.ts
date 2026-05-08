@@ -27,6 +27,7 @@ function insertCircle(columnNumber: number) {
 	if (!insertToElement) return false;
 
 	count++;
+
 	gameArea.style.pointerEvents = 'none';
 
 	const elementCoordinates = insertToElement.getBoundingClientRect();
@@ -71,6 +72,12 @@ function insertCircle(columnNumber: number) {
 			}
 
 			user = user === 'player1' ? 'player2' : 'player1';
+
+			if (count === 41) {
+				gameArea.style.pointerEvents = 'none';
+				header.textContent = 'No one won!!';
+				header.style.color = 'var(--color-white)';
+			}
 		}, 1000);
 	}, 150);
 
@@ -83,21 +90,7 @@ function callComputer() {
 	insertCircle(columnNumber);
 }
 
-gameArea.addEventListener('click', (e) => {
-	const circle = <HTMLDivElement>(e.target as HTMLDivElement).closest('.circle');
-
-	if (!circle || !circle.dataset['id']) return;
-
-	const columnNumber = +circle.dataset['id'] % 7;
-
-	const isSuccess = insertCircle(columnNumber);
-
-	if (isSuccess) {
-		timer1 = setTimeout(callComputer, 1500);
-	}
-});
-
-restartButton.addEventListener('click', () => {
+function restartGame() {
 	count = 0;
 	user = 'player1';
 	header.textContent = 'Your Move';
@@ -123,6 +116,22 @@ restartButton.addEventListener('click', () => {
 	clearTimeout(timer1);
 	clearTimeout(timer2);
 	clearTimeout(timer3);
+}
+
+gameArea.addEventListener('click', (e) => {
+	const circle = <HTMLDivElement>(e.target as HTMLDivElement).closest('.circle');
+
+	if (!circle || !circle.dataset['id']) return;
+
+	const columnNumber = +circle.dataset['id'] % 7;
+
+	const isSuccess = insertCircle(columnNumber);
+
+	if (isSuccess) {
+		timer1 = setTimeout(callComputer, 1500);
+	}
 });
+
+restartButton.addEventListener('click', () => restartGame());
 
 export type { User };

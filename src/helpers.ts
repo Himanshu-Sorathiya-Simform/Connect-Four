@@ -15,130 +15,58 @@ function findLastUnmodified(columnNumber: number) {
 function isWin(elementId: string | undefined, user: User) {
 	if (!elementId) return;
 
-	const column = +elementId % 7;
-	const row = Math.floor(+elementId / 7);
+	const horizontalWin =
+		1 +
+		checkInDirection(+elementId, 0, 1, user) +
+		checkInDirection(+elementId, 0, -1, user);
+	const verticalWin = 1 + checkInDirection(+elementId, 1, 0, user);
+	const diagonalWin =
+		1 +
+		checkInDirection(+elementId, 1, 1, user) +
+		checkInDirection(+elementId, -1, -1, user);
+	const antiDiagonalWin =
+		1 +
+		checkInDirection(+elementId, 1, -1, user) +
+		checkInDirection(+elementId, -1, 1, user);
 
-	const horizontalWin = checkHorizontal(+elementId, column, user);
-	const verticalWin = checkVertical(+elementId, user);
-	const diagonalWin = checkDiagonal(+elementId, row, user);
-	const antiDiagonalWin = checkAntiDiagonal(+elementId, row, user);
-
-	return horizontalWin || verticalWin || diagonalWin || antiDiagonalWin;
+	return (
+		horizontalWin === 4 ||
+		verticalWin === 4 ||
+		diagonalWin === 4 ||
+		antiDiagonalWin === 4
+	);
 }
 
-function checkHorizontal(elementId: number, column: number, user: User) {
-	let count = 1;
+function checkInDirection(
+	elementId: number,
+	rowStep: number,
+	colStep: number,
+	user: User,
+) {
+	let matchCount = 0;
+	const startRow = Math.floor(elementId / 7);
+	const startCol = elementId % 7;
 
-	for (let i = 0; i < Math.min(3, 7 - (7 - column - 1) - 1); i++) {
-		const ele = allElements[elementId - i - 1];
-		const eleID = ele?.dataset['id'];
+	for (let i = 1; i <= 3; i++) {
+		const targetRow = rowStep * i + startRow;
+		const targetCol = colStep * i + startCol;
 
-		if (!ele || !eleID) break;
+		if (targetRow < 0 || targetCol > 6 || targetCol < 0 || targetCol > 6) break;
 
-		if (ele.classList.contains(user)) {
-			count++;
+		const targetElePosition = targetRow * 7 + targetCol;
+
+		const targetEle = allElements.at(targetElePosition);
+
+		if (!targetEle) break;
+
+		if (targetEle.classList.contains(user)) {
+			matchCount++;
 		} else {
 			break;
 		}
 	}
 
-	for (let i = 0; i < Math.min(3, 7 - column - 1); i++) {
-		const ele = allElements[elementId + i + 1];
-		const eleID = ele?.dataset['id'];
-
-		if (!ele || !eleID) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	return count >= 4;
-}
-
-function checkVertical(elementId: number, user: User) {
-	let count = 1;
-
-	for (let i = 0; i < 3; i++) {
-		const ele = allElements[elementId + 7 * (i + 1)];
-		const eleID = ele?.dataset['id'];
-
-		if (!ele || !eleID) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	return count >= 4;
-}
-
-function checkDiagonal(elementId: number, row: number, user: User) {
-	let count = 1;
-
-	for (let i = 0; i < 3; i++) {
-		const ele = allElements[elementId - (i + 1) * 8];
-		const eleID = ele?.dataset['id']!;
-
-		if (!ele || !eleID || row - i - 1 !== Math.floor(+eleID / 7)) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	for (let i = 0; i < 3; i++) {
-		const ele = allElements[elementId + (i + 1) * 8];
-		const eleID = ele?.dataset['id']!;
-
-		if (!ele || !eleID || row + i + 1 !== Math.floor(+eleID / 7)) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	return count >= 4;
-}
-
-function checkAntiDiagonal(elementId: number, row: number, user: User) {
-	let count = 1;
-
-	for (let i = 0; i < 3; i++) {
-		const ele = allElements[elementId - (i + 1) * 6];
-		const eleID = ele?.dataset['id']!;
-
-		if (!ele || !eleID || row - i - 1 !== Math.floor(+eleID / 7)) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	for (let i = 0; i < 3; i++) {
-		const ele = allElements[elementId + (i + 1) * 6];
-		const eleID = ele?.dataset['id']!;
-
-		if (!ele || !eleID || row + i + 1 !== Math.floor(+eleID / 7)) break;
-
-		if (ele.classList.contains(user)) {
-			count++;
-		} else {
-			break;
-		}
-	}
-
-	return count >= 4;
+	return matchCount;
 }
 
 export { findLastUnmodified, isWin };
