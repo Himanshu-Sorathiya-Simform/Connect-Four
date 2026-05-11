@@ -73,7 +73,10 @@ function insertCircle(columnNumber: number) {
 		insertToElement.classList.add('played');
 
 		timer3 = setTimeout(() => {
-			insertToElement.classList.add(user);
+			const childElement = document.createElement('span');
+			childElement.classList.add('circle', user);
+
+			insertToElement.append(childElement);
 
 			header.textContent = user === 'player1' ? 'Computer Move' : 'Your Move';
 
@@ -98,6 +101,19 @@ function insertCircle(columnNumber: number) {
 				gameArea.style.pointerEvents = 'none';
 				playerCircle.hidden = true;
 				clearTimeout(timer1);
+
+				gameArea.classList.add('shake');
+
+				setTimeout(() => {
+					allElements.forEach((el) => {
+						if (el.classList.contains('played')) {
+							el.classList.remove('played');
+							el.firstElementChild?.classList.add('falling');
+						}
+					});
+
+					restartGame();
+				}, 1000);
 			}
 
 			user = user === 'player1' ? 'player2' : 'player1';
@@ -125,7 +141,6 @@ function restartGame() {
 
 	header.textContent = 'Your Move';
 	header.style.color = 'var(--color-white)';
-	header.classList.add('animate__animated', 'animate__fadeIn');
 
 	playerCircle.classList.add('animate__animated', 'animate__fadeIn');
 	playerCircle.hidden = false;
@@ -135,7 +150,6 @@ function restartGame() {
 	playerCircle.classList.remove('player2');
 	playerCircle.classList.add('player1');
 
-	gameArea.classList.add('animate__animated', 'animate__rotateOut');
 	gameArea.style.pointerEvents = 'none';
 
 	clearTimeout(timer1);
@@ -152,18 +166,20 @@ function restartGame() {
 			header.classList.remove('animate__animated', 'animate__fadeIn');
 			playerCircle.classList.remove('animate__animated', 'animate__fadeIn');
 
-			gameArea.classList.remove('animate__animated', 'animate__rotateOut');
+			gameArea.classList.remove('animate__animated', 'animate__rotateOut', 'shake');
 			gameArea.style.pointerEvents = 'all';
 
-			allElements.forEach((ele) =>
-				ele.classList.remove('player1', 'player2', 'played'),
-			);
+			allElements.forEach((ele) => {
+				ele.classList.remove('played');
+				ele.firstElementChild?.classList.remove('player1', 'player2');
+				ele.firstElementChild?.remove();
+			});
 		};
 	}
 }
 
 gameArea.addEventListener('click', (e) => {
-	const circle = <HTMLDivElement>(e.target as HTMLDivElement).closest('.circle');
+	const circle = <HTMLDivElement>(e.target as HTMLDivElement).closest('.game-circle');
 
 	if (!circle || !circle.dataset['id']) return;
 
@@ -176,6 +192,11 @@ gameArea.addEventListener('click', (e) => {
 	}
 });
 
-restartButton.addEventListener('click', () => restartGame());
+restartButton.addEventListener('click', () => {
+	header.classList.add('animate__animated', 'animate__fadeIn');
+	gameArea.classList.add('animate__animated', 'animate__rotateOut');
+
+	restartGame();
+});
 
 export type { User };

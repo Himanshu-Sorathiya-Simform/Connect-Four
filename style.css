@@ -23,6 +23,7 @@ html {
 	color: var(--color-white);
 	background-color: var(--color-primary);
 	font-size: 1.5rem;
+	overflow: hidden;
 
 	display: flex;
 	flex-direction: column;
@@ -51,6 +52,7 @@ html {
 }
 
 .circle {
+	display: block;
 	height: 3.5rem;
 	width: 3.5rem;
 	background-color: var(--color-primary);
@@ -87,6 +89,24 @@ html {
 	background-color: var(--color-white);
 	border-radius: 10px;
 	cursor: pointer;
+}
+
+.shake {
+	animation: shakeX;
+	animation-duration: 2000ms;
+}
+
+.falling {
+	animation: falling 1500ms forwards;
+}
+
+@keyframes falling {
+	from {
+		transform: translateY(0);
+	}
+	to {
+		transform: translateY(500px);
+	}
 }
 
 @media (max-width: 600px) {

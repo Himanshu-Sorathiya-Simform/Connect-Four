@@ -55,7 +55,7 @@ function checkInDirection(
 
 		const targetElePosition = targetRow * 7 + targetCol;
 
-		const targetEle = allElements.at(targetElePosition);
+		const targetEle = allElements.at(targetElePosition)?.firstElementChild;
 
 		if (!targetEle) break;
 
