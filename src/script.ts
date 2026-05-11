@@ -122,29 +122,44 @@ function callComputer() {
 function restartGame() {
 	count = 0;
 	user = 'player1';
-	header.textContent = 'Your Move';
 
+	header.textContent = 'Your Move';
+	header.style.color = 'var(--color-white)';
+	header.classList.add('animate__animated', 'animate__fadeIn');
+
+	playerCircle.classList.add('animate__animated', 'animate__fadeIn');
 	playerCircle.hidden = false;
-	playerCircle.style.transition = 'none';
 	playerCircle.style.top = `0px`;
 	playerCircle.style.left = `0px`;
 	playerCircle.classList.remove('player1');
 	playerCircle.classList.remove('player2');
 	playerCircle.classList.add('player1');
 
-	header.style.color = 'var(--color-white)';
+	gameArea.classList.add('animate__animated', 'animate__rotateOut');
+	gameArea.style.pointerEvents = 'none';
+
+	clearTimeout(timer1);
+	clearTimeout(timer2);
+	clearTimeout(timer3);
 
 	requestAnimationFrame(() => {
 		playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
 	});
 
-	gameArea.style.pointerEvents = 'all';
+	let animations = gameArea.getAnimations();
+	for (const animation of animations) {
+		animation.onfinish = function () {
+			header.classList.remove('animate__animated', 'animate__fadeIn');
+			playerCircle.classList.remove('animate__animated', 'animate__fadeIn');
 
-	allElements.forEach((ele) => ele.classList.remove('player1', 'player2', 'played'));
+			gameArea.classList.remove('animate__animated', 'animate__rotateOut');
+			gameArea.style.pointerEvents = 'all';
 
-	clearTimeout(timer1);
-	clearTimeout(timer2);
-	clearTimeout(timer3);
+			allElements.forEach((ele) =>
+				ele.classList.remove('player1', 'player2', 'played'),
+			);
+		};
+	}
 }
 
 gameArea.addEventListener('click', (e) => {
