@@ -11,8 +11,16 @@
 	box-sizing: border-box;
 }
 
-html {
-	font-family: 'Poppins', sans-serif;
+@font-face {
+	font-family: 'Blomberg';
+	src: url('./assets/fonts/Blomberg.otf') format('opentype');
+	font-weight: normal;
+	font-style: normal;
+	font-display: swap;
+}
+
+body {
+	font-family: 'Blomberg', sans-serif;
 }
 
 .container {
