@@ -2,6 +2,7 @@ import { findLastUnmodified, isWin } from './helpers.js';
 
 const header = document.querySelector<HTMLHeadingElement>('h1')!;
 const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
+const gameAreaContainer = document.querySelector<HTMLDivElement>('.game-area-container')!;
 const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
 const restartButton = document.querySelector<HTMLButtonElement>('.restart-button')!;
 const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
@@ -18,6 +19,17 @@ let count = 0;
 let timer1: undefined | number = undefined;
 let timer2: undefined | number = undefined;
 let timer3: undefined | number = undefined;
+
+gameAreaContainer.classList.add('animate__animated', 'animate__bounceInDown');
+gameAreaContainer.style.pointerEvents = 'none';
+
+let animations = gameAreaContainer.getAnimations();
+for (const animation of animations) {
+	animation.onfinish = function () {
+		gameAreaContainer.classList.remove('animate__animated', 'animate__bounceInDown');
+		gameAreaContainer.style.pointerEvents = 'all';
+	};
+}
 
 function insertCircle(columnNumber: number) {
 	const insertToElement = findLastUnmodified(columnNumber);

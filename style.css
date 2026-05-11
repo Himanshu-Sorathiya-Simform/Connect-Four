@@ -30,6 +30,16 @@ html {
 	justify-content: center;
 }
 
+.game-area-container {
+	position: relative;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 1rem;
+}
+
 .game-area {
 	padding: 1rem;
 	background-color: var(--color-white);
