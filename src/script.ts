@@ -22,9 +22,26 @@ let timer3: undefined | number = undefined;
 function insertCircle(columnNumber: number) {
 	const insertToElement = findLastUnmodified(columnNumber);
 
-	if (!insertToElement && user === 'player2') callComputer();
+	if (!insertToElement && user === 'player2') {
+		callComputer();
 
-	if (!insertToElement) return false;
+		return false;
+	}
+
+	if (!insertToElement) {
+		gameArea.classList.add('animate__animated', 'animate__wobble');
+		gameArea.style.pointerEvents = 'none';
+
+		let animations = gameArea.getAnimations();
+		for (const animation of animations) {
+			animation.onfinish = function () {
+				gameArea.classList.remove('animate__animated', 'animate__wobble');
+				gameArea.style.pointerEvents = 'all';
+			};
+		}
+
+		return false;
+	}
 
 	count++;
 
