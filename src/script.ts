@@ -4,7 +4,8 @@ import {
 	animationFadeIn,
 	animationFalling,
 	animationRotateOut,
-	animationShakeX,
+	animationShakeXPart1,
+	animationShakeXPart2,
 	animationWobble,
 } from './animations.js';
 import {
@@ -42,43 +43,30 @@ onAnimationEnd(gameAreaContainer, () => {
 function handleWin() {
 	const youWin = user === 'player1';
 
+	playerCircle.classList.remove('player1', 'player2');
+	playerCircle.classList.add(user);
+
 	header.textContent = youWin ? 'YOU WON!!' : 'COMPUTER WON';
 	header.style.color = youWin ? 'var(--color-one)' : 'var(--color-two)';
 
-	gameArea.style.pointerEvents = 'none';
 	clearTimeout(timer1);
 
-	addAnimation(gameArea, animationShakeX, () => {
-		const animation = gameArea.getAnimations()[0];
+	addAnimation(gameArea, animationShakeXPart1, () => {
+		gameArea.style.pointerEvents = 'none';
+	});
 
-		function checkProgress() {
-			const timing = animation?.effect?.getComputedTiming();
-			const duration = +(timing?.activeDuration ?? 0);
+	onAnimationEnd(gameArea, () => {
+		allElements.forEach((el) => {
+			if (el.classList.contains('played')) {
+				const firstElementChild = <HTMLElement>el.firstElementChild!;
 
-			if (
-				animation &&
-				animation.currentTime &&
-				+animation.currentTime >= duration / 2
-			) {
-				allElements.forEach((el) => {
-					if (el.classList.contains('played')) {
-						el.classList.remove('played');
-
-						const firstElementChild = <HTMLElement>el.firstElementChild!;
-
-						addAnimation(firstElementChild, animationFalling);
-					}
-				});
-
-				restartGame();
-
-				return;
+				addAnimation(firstElementChild, animationFalling);
 			}
+		});
 
-			requestAnimationFrame(checkProgress);
-		}
+		addAnimation(gameArea, animationShakeXPart2);
 
-		requestAnimationFrame(checkProgress);
+		restartGame();
 	});
 }
 
@@ -191,7 +179,6 @@ function restartGame() {
 
 		allElements.forEach((ele) => {
 			ele.classList.remove('played');
-			ele.firstElementChild?.classList.remove('player1', 'player2');
 			ele.firstElementChild?.remove();
 		});
 	});

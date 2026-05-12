@@ -1,20 +1,20 @@
 const animationBounceInDownKeyFrames = [
 	{
 		opacity: '0',
-		transform: 'translate3d(0, -3000px, 0) scaleY(3)',
+		transform: 'translate3d(0, -3000px, 0)',
 		offset: 0,
 	},
 	{
 		opacity: '1',
-		transform: 'translate3d(0, 25px, 0) scaleY(0.9)',
+		transform: 'translate3d(0, 25px, 0)',
 		offset: 0.65,
 	},
 	{
-		transform: 'translate3d(0, -10px, 0) scaleY(0.95)',
+		transform: 'translate3d(0, -10px, 0)',
 		offset: 0.75,
 	},
 	{
-		transform: 'translate3d(0, 5px, 0) scaleY(0.985)',
+		transform: 'translate3d(0, 5px, 0)',
 		offset: 0.9,
 	},
 	{
@@ -102,24 +102,34 @@ const animationRotateOutTimings = {
 	easing: 'ease-in',
 };
 
-const animationShakeXKeyFrames = [
+const animationShakeXPart1KeyFrames = [
 	{ transform: 'translate3d(0, 0, 0)', offset: 0 },
-	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.1 },
-	{ transform: 'translate3d(10px, 0, 0)', offset: 0.2 },
-	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.3 },
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.2 },
 	{ transform: 'translate3d(10px, 0, 0)', offset: 0.4 },
-	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.5 },
-	{ transform: 'translate3d(10px, 0, 0)', offset: 0.6 },
-	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.7 },
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.6 },
 	{ transform: 'translate3d(10px, 0, 0)', offset: 0.8 },
-	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.9 },
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 1 },
+];
+
+const animationShakeXPart1Timings = {
+	duration: 500,
+	iterations: 1,
+	easing: 'ease-in',
+};
+
+const animationShakeXPart2KeyFrames = [
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 0 }, // Starts where Part 1 ended
+	{ transform: 'translate3d(10px, 0, 0)', offset: 0.2 },
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.4 },
+	{ transform: 'translate3d(10px, 0, 0)', offset: 0.6 },
+	{ transform: 'translate3d(-10px, 0, 0)', offset: 0.8 },
 	{ transform: 'translate3d(0, 0, 0)', offset: 1 },
 ];
 
-const animationShakeXTimings = {
-	duration: 2000,
+const animationShakeXPart2Timings = {
+	duration: 500,
 	iterations: 1,
-	easing: 'ease-in-out',
+	easing: 'ease-out',
 };
 
 const animationFallingKeyFrames = [
@@ -159,9 +169,14 @@ const animationRotateOut = {
 	options: animationRotateOutTimings,
 };
 
-const animationShakeX = {
-	keyframes: animationShakeXKeyFrames,
-	options: animationShakeXTimings,
+const animationShakeXPart1 = {
+	keyframes: animationShakeXPart1KeyFrames,
+	options: animationShakeXPart1Timings,
+};
+
+const animationShakeXPart2 = {
+	keyframes: animationShakeXPart2KeyFrames,
+	options: animationShakeXPart2Timings,
 };
 
 const animationFalling = {
@@ -174,6 +189,7 @@ export {
 	animationFadeIn,
 	animationFalling,
 	animationRotateOut,
-	animationShakeX,
-	animationWobble,
+	animationShakeXPart1,
+	animationShakeXPart2,
+	animationWobble
 };
