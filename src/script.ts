@@ -1,11 +1,22 @@
-import { findLastUnmodified, isWin } from './helpers.js';
-
-const header = document.querySelector<HTMLHeadingElement>('h1')!;
-const playerCircle = document.querySelector<HTMLDivElement>('.player')!;
-const gameAreaContainer = document.querySelector<HTMLDivElement>('.game-area-container')!;
-const gameArea = document.querySelector<HTMLDivElement>('.game-area')!;
-const restartButton = document.querySelector<HTMLButtonElement>('.restart-button')!;
-const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
+import './animations.js';
+import {
+	animationBounceInDown,
+	animationFadeIn,
+	animationFalling,
+	animationRotateOut,
+	animationShakeX,
+	animationWobble,
+} from './animations.js';
+import {
+	allElements,
+	gameArea,
+	gameAreaContainer,
+	header,
+	playerCircle,
+	restartButton,
+} from './elements.js';
+import { addAnimation, onAnimationEnd } from './helpers/animationHelpers.js';
+import { findLastUnmodified, isWin } from './helpers/gameHelpers.js';
 
 type User = 'player1' | 'player2';
 
@@ -20,15 +31,55 @@ let timer1: undefined | number = undefined;
 let timer2: undefined | number = undefined;
 let timer3: undefined | number = undefined;
 
-gameAreaContainer.classList.add('animate__animated', 'animate__bounceInDown');
-gameAreaContainer.style.pointerEvents = 'none';
+addAnimation(gameAreaContainer, animationBounceInDown, () => {
+	gameAreaContainer.style.pointerEvents = 'none';
+});
 
-let animations = gameAreaContainer.getAnimations();
-for (const animation of animations) {
-	animation.onfinish = function () {
-		gameAreaContainer.classList.remove('animate__animated', 'animate__bounceInDown');
-		gameAreaContainer.style.pointerEvents = 'all';
-	};
+onAnimationEnd(gameAreaContainer, () => {
+	gameAreaContainer.style.pointerEvents = 'all';
+});
+
+function handleWin() {
+	const youWin = user === 'player1';
+
+	header.textContent = youWin ? 'YOU WON!!' : 'COMPUTER WON';
+	header.style.color = youWin ? 'var(--color-one)' : 'var(--color-two)';
+
+	gameArea.style.pointerEvents = 'none';
+	clearTimeout(timer1);
+
+	addAnimation(gameArea, animationShakeX, () => {
+		const animation = gameArea.getAnimations()[0];
+
+		function checkProgress() {
+			const timing = animation?.effect?.getComputedTiming();
+			const duration = +(timing?.activeDuration ?? 0);
+
+			if (
+				animation &&
+				animation.currentTime &&
+				+animation.currentTime >= duration / 2
+			) {
+				allElements.forEach((el) => {
+					if (el.classList.contains('played')) {
+						el.classList.remove('played');
+
+						const firstElementChild = <HTMLElement>el.firstElementChild!;
+
+						addAnimation(firstElementChild, animationFalling);
+					}
+				});
+
+				restartGame();
+
+				return;
+			}
+
+			requestAnimationFrame(checkProgress);
+		}
+
+		requestAnimationFrame(checkProgress);
+	});
 }
 
 function insertCircle(columnNumber: number) {
@@ -41,16 +92,13 @@ function insertCircle(columnNumber: number) {
 	}
 
 	if (!insertToElement) {
-		gameArea.classList.add('animate__animated', 'animate__wobble');
-		gameArea.style.pointerEvents = 'none';
+		addAnimation(gameArea, animationWobble, () => {
+			gameArea.style.pointerEvents = 'none';
+		});
 
-		let animations = gameArea.getAnimations();
-		for (const animation of animations) {
-			animation.onfinish = function () {
-				gameArea.classList.remove('animate__animated', 'animate__wobble');
-				gameArea.style.pointerEvents = 'all';
-			};
-		}
+		onAnimationEnd(gameArea, () => {
+			gameArea.style.pointerEvents = 'all';
+		});
 
 		return false;
 	}
@@ -93,27 +141,7 @@ function insertCircle(columnNumber: number) {
 			gameArea.style.pointerEvents = 'all';
 
 			if (count >= 7 && isWin(insertToElement.dataset['id'], user)) {
-				const youWin = user === 'player1';
-
-				header.textContent = youWin ? 'YOU WON!!' : 'COMPUTER WON';
-				header.style.color = youWin ? 'var(--color-one)' : 'var(--color-two)';
-
-				gameArea.style.pointerEvents = 'none';
-				playerCircle.hidden = true;
-				clearTimeout(timer1);
-
-				gameArea.classList.add('shake');
-
-				setTimeout(() => {
-					allElements.forEach((el) => {
-						if (el.classList.contains('played')) {
-							el.classList.remove('played');
-							el.firstElementChild?.classList.add('falling');
-						}
-					});
-
-					restartGame();
-				}, 1000);
+				return handleWin();
 			}
 
 			user = user === 'player1' ? 'player2' : 'player1';
@@ -142,15 +170,13 @@ function restartGame() {
 	header.textContent = 'Your Move';
 	header.style.color = 'var(--color-white)';
 
-	playerCircle.classList.add('animate__animated', 'animate__fadeIn');
-	playerCircle.hidden = false;
 	playerCircle.style.top = `0px`;
 	playerCircle.style.left = `0px`;
-	playerCircle.classList.remove('player1');
-	playerCircle.classList.remove('player2');
-	playerCircle.classList.add('player1');
+	playerCircle.classList.remove('player1', 'player2');
+	playerCircle.classList.add(user);
 
-	gameArea.style.pointerEvents = 'none';
+	addAnimation(header, animationFadeIn);
+	addAnimation(playerCircle, animationFadeIn);
 
 	clearTimeout(timer1);
 	clearTimeout(timer2);
@@ -160,22 +186,15 @@ function restartGame() {
 		playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
 	});
 
-	let animations = gameArea.getAnimations();
-	for (const animation of animations) {
-		animation.onfinish = function () {
-			header.classList.remove('animate__animated', 'animate__fadeIn');
-			playerCircle.classList.remove('animate__animated', 'animate__fadeIn');
+	onAnimationEnd(gameArea, () => {
+		gameArea.style.pointerEvents = 'all';
 
-			gameArea.classList.remove('animate__animated', 'animate__rotateOut', 'shake');
-			gameArea.style.pointerEvents = 'all';
-
-			allElements.forEach((ele) => {
-				ele.classList.remove('played');
-				ele.firstElementChild?.classList.remove('player1', 'player2');
-				ele.firstElementChild?.remove();
-			});
-		};
-	}
+		allElements.forEach((ele) => {
+			ele.classList.remove('played');
+			ele.firstElementChild?.classList.remove('player1', 'player2');
+			ele.firstElementChild?.remove();
+		});
+	});
 }
 
 gameArea.addEventListener('click', (e) => {
@@ -193,8 +212,9 @@ gameArea.addEventListener('click', (e) => {
 });
 
 restartButton.addEventListener('click', () => {
-	header.classList.add('animate__animated', 'animate__fadeIn');
-	gameArea.classList.add('animate__animated', 'animate__rotateOut');
+	addAnimation(gameArea, animationRotateOut, () => {
+		gameArea.style.pointerEvents = 'none';
+	});
 
 	restartGame();
 });

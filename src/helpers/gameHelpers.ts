@@ -1,6 +1,5 @@
-import type { User } from './script.js';
-
-const allElements = [...document.querySelectorAll<HTMLDivElement>('.game-circle')];
+import { allElements } from '../elements.js';
+import type { User } from '../script.js';
 
 function findLastUnmodified(columnNumber: number) {
 	for (let i = 6; i >= 0; i--) {

@@ -99,24 +99,6 @@ body {
 	cursor: pointer;
 }
 
-.shake {
-	animation: shakeX;
-	animation-duration: 2000ms;
-}
-
-.falling {
-	animation: falling 1500ms forwards;
-}
-
-@keyframes falling {
-	from {
-		transform: translateY(0);
-	}
-	to {
-		transform: translateY(500px);
-	}
-}
-
 @media (max-width: 600px) {
 	.container {
 		font-size: 1rem;
