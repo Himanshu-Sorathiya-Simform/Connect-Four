@@ -1,7 +1,9 @@
 function addAnimation(ele: HTMLElement, animation: any, callback?: Function) {
-	ele.animate(animation.keyframes, animation.options);
+	const animationObj = ele.animate(animation.keyframes, animation.options);
 
 	callback?.();
+
+	return animationObj;
 }
 
 function onAnimationEnd(ele: HTMLElement, callback: Function) {

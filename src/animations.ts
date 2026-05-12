@@ -24,9 +24,9 @@ const animationBounceInDownKeyFrames = [
 ];
 
 const animationBounceInDownTimings = {
-	duration: 2000,
+	duration: 1200,
 	iterations: 1,
-	easing: 'cubic-bezier(0.215, 0.61, 0.355, 1)',
+	easing: 'linear',
 };
 
 const animationWobbleKeyFrames = [

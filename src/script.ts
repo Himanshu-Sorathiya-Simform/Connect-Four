@@ -28,9 +28,7 @@ playerCircle.style.top = `0px`;
 
 let user: User = 'player1';
 let count = 0;
-let timer1: undefined | number = undefined;
-let timer2: undefined | number = undefined;
-let timer3: undefined | number = undefined;
+let computerTimer: undefined | number = undefined;
 
 addAnimation(gameAreaContainer, animationBounceInDown, () => {
 	gameAreaContainer.style.pointerEvents = 'none';
@@ -49,7 +47,7 @@ function handleWin() {
 	header.textContent = youWin ? 'YOU WON!!' : 'COMPUTER WON';
 	header.style.color = youWin ? 'var(--color-one)' : 'var(--color-two)';
 
-	clearTimeout(timer1);
+	clearTimeout(computerTimer);
 
 	addAnimation(gameArea, animationShakeXPart1, () => {
 		gameArea.style.pointerEvents = 'none';
@@ -95,20 +93,51 @@ function insertCircle(columnNumber: number) {
 
 	gameArea.style.pointerEvents = 'none';
 
+	const rowNumber = Math.floor(+(insertToElement.dataset['id'] ?? 0) / 7);
 	const elementCoordinates = insertToElement.getBoundingClientRect();
 
 	const elementLeftCoordinates = +elementCoordinates.left;
 	const newLeftPosition = elementLeftCoordinates - initialLeftPosition;
-	playerCircle.style.left = `${newLeftPosition}px`;
 
 	const elementTopCoordinates = +elementCoordinates.top;
 	const newTopPosition = elementTopCoordinates - initialTopPosition;
 
-	timer2 = setTimeout(() => {
-		playerCircle.style.top = `${newTopPosition}px`;
-		insertToElement.classList.add('played');
+	const animationHorizontalKeyframes = [
+		{ transform: `translate(0px, 0px)` },
+		{ transform: `translate(${newLeftPosition}px, 0px)` },
+	];
+	const animationHorizontalTimings = {
+		duration: 100 * Math.abs(3 - columnNumber) || 1,
+		iteration: 1,
+		easing: 'linear',
+	};
+	const animationHorizontal = {
+		keyframes: animationHorizontalKeyframes,
+		options: animationHorizontalTimings,
+	};
 
-		timer3 = setTimeout(() => {
+	const animationVerticalKeyframes = [
+		{ transform: `translate(${newLeftPosition}px, 0px)` },
+		{ transform: `translate(${newLeftPosition}px, ${newTopPosition}px)` },
+	];
+	const animationVerticalTimings = {
+		duration: 200 * (rowNumber + 1),
+		iteration: 1,
+		easing: 'linear',
+	};
+	const animationVertical = {
+		keyframes: animationVerticalKeyframes,
+		options: animationVerticalTimings,
+	};
+
+	addAnimation(playerCircle, animationHorizontal, () => {
+		insertToElement.classList.add('played');
+	});
+
+	onAnimationEnd(playerCircle, () => {
+		const animation = addAnimation(playerCircle, animationVertical);
+
+		animation.onfinish = () => {
 			const childElement = document.createElement('span');
 			childElement.classList.add('circle', user);
 
@@ -139,8 +168,8 @@ function insertCircle(columnNumber: number) {
 				header.textContent = 'No one won!!';
 				header.style.color = 'var(--color-white)';
 			}
-		}, 1000);
-	}, 150);
+		};
+	});
 
 	return true;
 }
@@ -166,9 +195,7 @@ function restartGame() {
 	addAnimation(header, animationFadeIn);
 	addAnimation(playerCircle, animationFadeIn);
 
-	clearTimeout(timer1);
-	clearTimeout(timer2);
-	clearTimeout(timer3);
+	clearTimeout(computerTimer);
 
 	requestAnimationFrame(() => {
 		playerCircle.style.transition = 'top 1000ms linear, left 150ms linear';
@@ -194,7 +221,7 @@ gameArea.addEventListener('click', (e) => {
 	const isSuccess = insertCircle(columnNumber);
 
 	if (isSuccess) {
-		timer1 = setTimeout(callComputer, 1500);
+		computerTimer = setTimeout(callComputer, 2000);
 	}
 });
 
